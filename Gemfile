@@ -51,6 +51,10 @@ group :development do
   gem 'sqlite3'
 end
 
+group :production do
+  gem 'pg'
+end
+
 gem 'jquery-rails'
 
 group :test do
