@@ -1,0 +1,83 @@
+<div class="main" style="display: flex;">
+  <div id="sketch">
+    <canvas id="paint" style="height: 720px;width: 720px;border: 1px solid lightseagreen; cursor: crosshair"></canvas>
+  </div>
+  <div class="color-picker">
+    <input type="color" id="color-inp">
+    <button type="submit" id="submit">change</button>
+  </div>
+</div>
+
+<button id="clear">Clear</button>
+<script>
+    var canvas = document.querySelector('#paint');
+    var ctx = canvas.getContext('2d');
+    color = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+    ctx.strokeStyle = color;
+    var data_que = [];
+
+    document.querySelector('#clear').onclick = function(){
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+    };
+
+
+    (function () {
+
+        var sketch = document.querySelector('#sketch');
+        var sketch_style = getComputedStyle(sketch);
+        canvas.width = parseInt(sketch_style.getPropertyValue('width'));
+        canvas.height = parseInt(sketch_style.getPropertyValue('height'));
+
+        var mouse = {x: 0, y: 0};
+        var last_mouse = {x: 0, y: 0};
+
+        /* Mouse Capturing Work */
+        canvas.addEventListener('mousemove', function (e) {
+            last_mouse.x = mouse.x;
+            last_mouse.y = mouse.y;
+
+            mouse.x = e.pageX - this.offsetLeft;
+            mouse.y = e.pageY - this.offsetTop;
+        }, false);
+
+
+        /* Drawing on Paint App */
+        ctx.lineWidth = 1;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+
+        canvas.addEventListener('mousedown', function (e) {
+            canvas.addEventListener('mousemove', onPaint, false);
+        }, false);
+
+        canvas.addEventListener('mouseup', function () {
+            canvas.removeEventListener('mousemove', onPaint, false);
+        }, false);
+
+
+        var onPaint = function () {
+            ctx.beginPath();
+            ctx.moveTo(last_mouse.x, last_mouse.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.closePath();
+            ctx.stroke();
+
+            let obj = {
+              color:  color,
+                location:{
+                  last_mouse:last_mouse,
+                    mouse:mouse
+                }
+            };
+            App.artboard.draw(obj);
+        };
+
+    }());
+
+    // setInterval(function () {
+    //     if(data_que.length>0)
+    //         App.artboard.draw(data_que);
+    //     data_que = []
+    // },300);
+
+</script>
